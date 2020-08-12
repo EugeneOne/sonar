@@ -6,6 +6,7 @@ go/*.exe~
 go/*.dll
 go/*.so
 go/*.dylib
+go/*.h
 
 # Test binary, built with `go test -c`
 go/*.test
