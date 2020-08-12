@@ -18,3 +18,4 @@ go/*.out
 
 # electron ignore
 #...
+gui/node_modules
