@@ -1,0 +1,20 @@
+# go ignore
+
+# Binaries for programs and plugins
+go/*.exe
+go/*.exe~
+go/*.dll
+go/*.so
+go/*.dylib
+
+# Test binary, built with `go test -c`
+go/*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+go/*.out
+
+# Dependency directories (remove the comment below to include it)
+# go/vendor/
+
+# electron ignore
+#...
