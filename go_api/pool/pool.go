@@ -1,8 +1,6 @@
 package pool
 
 import (
-	"crypto/md5"
-	"fmt"
 	"go_api/audio"
 	"go_api/err"
 	"sync"
@@ -16,14 +14,7 @@ func init() {
 	pool = make(map[string]audio.Audio)
 }
 
-func Put(audio audio.Audio) (string, error) {
-	info, e := audio.Info()
-	if nil != e {
-		return "", e
-	}
-
-	hash := fmt.Sprintf("%x", md5.Sum([]byte(info.FilePath)))
-
+func Put(hash string, audio audio.Audio) (string, error) {
 	lock.Lock()
 	defer lock.Unlock()
 
