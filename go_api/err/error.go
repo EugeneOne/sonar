@@ -17,5 +17,14 @@ func New(code int, msg string) error {
 }
 
 const (
-	FileExistsInPool = iota + 1
+	Success = iota
+	FileNotExists
+	FilePermissionDenied
+	FilePathIsDir
+	FileDecodeFailed
+	FileTypeUnsupported
+	SpeakerInitFailed
+	FileExistsInPool
+
+	UnknownErr = -1
 )
