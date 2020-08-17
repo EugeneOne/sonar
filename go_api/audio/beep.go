@@ -69,6 +69,7 @@ func newBeepAudio(filePath string) (Audio, error) {
 	}
 
 	audio.WrappedStreamer = audio.volume
+	audio.done = make(chan struct{}, 1)
 
 	return audio, nil
 }
@@ -79,7 +80,6 @@ func (audio *BeepAudio) Play() error {
 		return err.New(err.SpeakerInitFailed, e.Error())
 	}
 
-	audio.done = make(chan struct{}, 1)
 	speaker.Play(beep.Seq(audio.WrappedStreamer, beep.Callback(func() {
 		audio.done <- struct{}{}
 	})))
@@ -105,6 +105,7 @@ func (audio *BeepAudio) Resume() error {
 func (audio *BeepAudio) Stop() error {
 	audio.Pause()
 	audio.Seek(0)
+	audio.done <- struct{}{}
 	return nil
 }
 
@@ -144,12 +145,10 @@ func (audio *BeepAudio) SetVolume(volume int) error {
 }
 
 func (audio *BeepAudio) Close() error {
-	speaker.Clear()
 	audio.Stop()
+	speaker.Clear()
 
-	if closer, ok := audio.WrappedStreamer.(beep.StreamCloser); ok {
-		return closer.Close()
-	}
-
+	audio.Streamer.Close()
+	close(audio.done)
 	return nil
 }
