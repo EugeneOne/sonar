@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/faiface/beep"
+	"github.com/faiface/beep/effects"
 	"github.com/faiface/beep/flac"
 	"github.com/faiface/beep/mp3"
 	"github.com/faiface/beep/speaker"
@@ -19,6 +20,7 @@ type BeepAudio struct {
 	WrappedStreamer beep.Streamer
 	Streamer        beep.StreamSeekCloser
 	ctrl            *beep.Ctrl
+	volume          *effects.Volume
 	done            chan struct{}
 }
 
@@ -59,7 +61,14 @@ func newBeepAudio(filePath string) (Audio, error) {
 		Paused:   false,
 	}
 
-	audio.WrappedStreamer = audio.ctrl
+	audio.volume = &effects.Volume{
+		Streamer: audio.ctrl,
+		Base:     2,
+		Volume:   0,
+		Silent:   false,
+	}
+
+	audio.WrappedStreamer = audio.volume
 
 	return audio, nil
 }
@@ -120,7 +129,17 @@ func (audio *BeepAudio) Position() (int, error) {
 }
 
 func (audio *BeepAudio) SetVolume(volume int) error {
+	if volume > 100 {
+		volume = 100
+	} else if volume < 0 {
+		volume = 0
+	}
 
+	speaker.Lock()
+	defer speaker.Unlock()
+
+	audio.volume.Silent = 0 == volume
+	audio.volume.Volume = float64(volume-100) / 20
 	return nil
 }
 
